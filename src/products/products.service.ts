@@ -1,33 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { Products } from './interfaces/product.interface';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+import { Connection, Model } from 'mongoose';
+import { Product } from './schemas/product.schema';
 
 @Injectable()
 export class ProductsService {
-  private readonly products: Products[] = [
-    {
-      id: 343,
-      name: 'Product 1',
-      price: 500,
-    },
-    {
-      id: 987,
-      name: 'Product 2',
-      price: 999,
-    },
-  ];
+  constructor(
+    @InjectModel(Product.name) private readonly productModel: Model<Product>,
+    @InjectConnection() private connection: Connection,
+  ) {}
 
   create(createProductDto: CreateProductDto) {
-    return createProductDto;
+    const createdProduct = new this.productModel(createProductDto);
+    return createdProduct.save();
   }
 
   findAll() {
-    return this.products;
+    return;
   }
 
   findOne(id: number) {
-    return this.products.find((item) => item.id === id);
+    return id;
   }
 
   update(id: number, updateProductDto: UpdateProductDto) {
